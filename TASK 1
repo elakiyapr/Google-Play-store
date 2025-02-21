@@ -1,0 +1,36 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+np.random.seed(42)
+categories = ['Games', 'Education', 'Lifestyle', 'Productivity', 'Health']
+num_apps = 100
+app_data = {
+    'app_name': [f'App {i+1}' for i in range(num_apps)], 
+    'installs': np.random.randint(5000, 5000000, size=num_apps), 
+    'revenue': np.random.uniform(1000, 50000, size=num_apps),  
+    'category': np.random.choice(categories, size=num_apps),  
+    'is_paid': np.random.choice([True, False], size=num_apps, p=[0.7, 0.3])  
+}
+df_apps = pd.DataFrame(app_data)
+print("Sample Data:")
+print(df_apps.head())
+paid_apps = df_apps[df_apps['is_paid'] == True]
+print(f"\nNumber of paid apps for analysis: {paid_apps.shape[0]}")
+plt.figure(figsize=(12, 7))  
+sns.set(style="whitegrid")  
+scatter_plot = sns.scatterplot(data=paid_apps, x='installs', y='revenue', hue='category', palette='Set2', s=100, edgecolor='black')
+X_installs = paid_apps[['installs']] 
+y_revenue = paid_apps['revenue']     
+lin_reg_model = LinearRegression()
+lin_reg_model.fit(X_installs, y_revenue)
+predicted_revenue = lin_reg_model.predict(X_installs)
+plt.plot(paid_apps['installs'], predicted_revenue, color='black', lw=2, label='Trendline')
+plt.title('Relationship Between Revenue and Installs for Paid Apps', fontsize=16, weight='bold')  
+plt.xlabel('Number of Installs (in millions)', fontsize=14) 
+plt.ylabel('Revenue ($)', fontsize=14) 
+plt.legend(title='App Category', title_fontsize='13', fontsize='12', loc='upper left')
+plt.xticks(ticks=np.arange(0, 5000000, 1000000), labels=[f'{x//1000000}M' for x in np.arange(0, 5000000, 1000000)])
+plt.xticks(rotation=45)
+plt.show()
